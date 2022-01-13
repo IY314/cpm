@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     // Build and execute mkdir commands
     std::ostringstream mkdir_root_cmd;
-    std::string subdirs[] = {{"src"}, {"bin"}, {"lib"}, {"inc"}, {".cpm"}};
+    std::string subdirs[] = {{"src"}, {"bin"}, {"lib"}, {"include"}, {".cpm"}};
     mkdir_root_cmd << "mkdir -p " << path;
     for (std::string dir : subdirs) {
         std::ostringstream mkdir_cmd;
