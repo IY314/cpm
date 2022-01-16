@@ -7,26 +7,17 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 // Internal headers
-#include "version.hh"
+#include "definitions.hh"
+#include "io.hh"
 
 // External library headers
 #include "argparse/argparse.hpp"
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
-
-std::string read_file(const char *filename) {
-    std::ifstream i(filename, std::fstream::in);
-    std::ostringstream oss;
-    std::string line;
-    while (std::getline(i, line)) {
-        oss << line << '\n';
-    }
-    i.close();
-    return oss.str();
-}
 
 void parse_args(argparse::ArgumentParser *args, int argc, char *argv[]) {
     args->add_argument("libname").help("the name of the library");
@@ -50,7 +41,7 @@ int main(int argc, char *argv[]) {
     argparse::ArgumentParser args("add-lib", CPM_VERSION);
     parse_args(&args, argc, argv);
 
-    if (!std::filesystem::exists(std::filesystem::path{"./.cpm/config.json"})) {
+    if (!std::filesystem::exists(std::filesystem::path{PATH_TO_CONFIG})) {
         std::cerr << "add-lib: Config file not found\n";
         std::exit(1);
     }
@@ -75,7 +66,13 @@ int main(int argc, char *argv[]) {
     }
 
     // Add library to config
-    json config_contents = json::parse(read_file("./cpm/config.json"));
-    config_contents.get("libs");
+    json config_contents = json::parse(read_file(PATH_TO_CONFIG));
+    std::vector<json> lib_vec = config_contents["libs"].get<std::vector<json>>();
+    lib_vec.push_back({
+        {"name", args.get("libname")},
+        {"path", "./lib/" + args.get("libname")}
+    });
+    config_contents["libs"] = lib_vec;
+    write_file(PATH_TO_CONFIG, config_contents.dump(4));
     return EXIT_SUCCESS;
 }

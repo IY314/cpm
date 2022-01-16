@@ -4,11 +4,11 @@
 // Standard library headers
 #include <string>
 #include <sstream>
-#include <fstream>
 #include <iostream>
 
 // Internal headers
-#include "version.hh"
+#include "definitions.hh"
+#include "io.hh"
 
 // External library headers
 #include "argparse/argparse.hpp"
@@ -94,19 +94,15 @@ int main(int argc, char *argv[]) {
     // Write default code to main file (.cc if --cxx option is set else .c)
     std::ostringstream main_file_path;
     main_file_path << path << "/src/main." << (args["cxx"] == true ? "cc" : "c");
-    std::ofstream main_file(main_file_path.str());
-    main_file << (args["cxx"] == true ? CXX_DEFAULT_CODE : C_DEFAULT_CODE);
-    main_file.close();
+    write_file(main_file_path.str(), args["cxx"] == true ? CXX_DEFAULT_CODE : C_DEFAULT_CODE);
 
     // Write config to .cpm config file
     std::ostringstream cpm_config_file_path;
     cpm_config_file_path << path << "/.cpm/config.json";
-    std::ofstream cpm_config_file(cpm_config_file_path.str());
     json config = {
         {"libs", json::array()},
         {"compile-flags", {"-Wall", "-Werror", std::string("-o bin/") + args.get("project_name")}}
     };
-    cpm_config_file << config.dump(4) << '\n';
-    cpm_config_file.close();
+    write_file(cpm_config_file_path.str(), config.dump(4), true);
     return EXIT_SUCCESS;
 }
