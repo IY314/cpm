@@ -67,11 +67,10 @@ int main(int argc, char *argv[]) {
 
     // Add library to config
     json config_contents = json::parse(read_file(PATH_TO_CONFIG));
-    std::vector<json> lib_vec = config_contents["libs"].get<std::vector<json>>();
-    lib_vec.push_back({
-        {"name", args.get("libname")},
-        {"path", "./lib/" + args.get("libname")}
-    });
+    std::vector<json> lib_vec =
+        config_contents["libs"].get<std::vector<json>>();
+    lib_vec.push_back({{"name", args.get("libname")},
+                       {"path", "./lib/" + args.get("libname")}});
     config_contents["libs"] = lib_vec;
     write_file(PATH_TO_CONFIG, config_contents.dump(4));
     return EXIT_SUCCESS;

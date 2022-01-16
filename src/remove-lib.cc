@@ -2,9 +2,9 @@
 // Created by Isaac Yee
 
 // Standard library headers
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 // Internal headers
 #include "definitions.hh"
@@ -39,12 +39,15 @@ int main(int argc, char *argv[]) {
     json config_contents = json::parse(read_file(PATH_TO_CONFIG));
     auto lib_vec = config_contents["libs"].get<std::vector<json>>();
     std::string path;
-    lib_vec.erase(std::remove_if(lib_vec.begin(), lib_vec.end(), [args, path] (json j) mutable {
-        if (j["name"].get<std::string>() == args.get("libname"))
-            path = j["path"].get<std::string>();
-            return true;
-        return false;
-    }), lib_vec.end());
+    lib_vec.erase(std::remove_if(lib_vec.begin(), lib_vec.end(),
+                                 [args, path](json j) mutable {
+                                     if (j["name"].get<std::string>() ==
+                                         args.get("libname"))
+                                         path = j["path"].get<std::string>();
+                                     return true;
+                                     return false;
+                                 }),
+                  lib_vec.end());
     config_contents["libs"] = lib_vec;
     write_file(PATH_TO_CONFIG, config_contents.dump(4), true);
     if (args["--rm"] == true) {

@@ -1,9 +1,9 @@
 #ifndef IO_HH
 #define IO_HH
 
-#include <string>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 std::string read_file(std::string filename) {
     std::ifstream i(filename, std::fstream::in);
@@ -16,7 +16,8 @@ std::string read_file(std::string filename) {
     return oss.str();
 }
 
-void write_file(std::string filename, std::string contents, bool newline = false) {
+void write_file(std::string filename, std::string contents,
+                bool newline = false) {
     std::ofstream o(filename, std::fstream::out);
     o << contents;
     if (newline) o << '\n';

@@ -2,9 +2,9 @@
 // Made by Isaac Yee
 
 // Standard library headers
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 // Internal headers
 #include "definitions.hh"
@@ -24,7 +24,9 @@ int main() {
     return 0;
 }
 */
-#define C_DEFAULT_CODE "#include <stdio.h>\n\nint main() {\n    printf(\"Hello World\\n\");\n    return 0;\n}\n"
+#define C_DEFAULT_CODE                                                         \
+    "#include <stdio.h>\n\nint main() {\n    printf(\"Hello World\\n\");\n   " \
+    " return 0;\n}\n"
 
 /*
 The C++ code, when written to the file, reads:
@@ -36,15 +38,18 @@ int main() {
     return 0;
 }
 */
-#define CXX_DEFAULT_CODE "#include <iostream>\n\nint main() {\n    std::cout << \"Hello World\\n\";\n    return 0;\n}\n"
+#define CXX_DEFAULT_CODE                                             \
+    "#include <iostream>\n\nint main() {\n    std::cout << \"Hello " \
+    "World\\n\";\n    return 0;\n}\n"
 
 using json = nlohmann::json;
 
 void parse_args(argparse::ArgumentParser *args, int argc, char *argv[]) {
-    args->add_argument("project_name")
-        .help("the name of the project");
+    args->add_argument("project_name").help("the name of the project");
     args->add_argument("project_path")
-        .help("the path to the project (not including the directory of the project)");
+        .help(
+            "the path to the project (not including the directory of the "
+            "project)");
     args->add_argument("-g", "--git")
         .default_value(false)
         .implicit_value(true)
@@ -53,7 +58,7 @@ void parse_args(argparse::ArgumentParser *args, int argc, char *argv[]) {
         .default_value(false)
         .implicit_value(true)
         .help("initializes a CXX project");
-    
+
     try {
         args->parse_args(argc, argv);
     } catch (const std::runtime_error &err) {
@@ -88,21 +93,22 @@ int main(int argc, char *argv[]) {
     std::system(cd_cmd.str().c_str());
 
     // If option set, initialize Git repo
-    if (args["git"] == true)
-        std::system("git init");
+    if (args["git"] == true) std::system("git init");
 
     // Write default code to main file (.cc if --cxx option is set else .c)
     std::ostringstream main_file_path;
-    main_file_path << path << "/src/main." << (args["cxx"] == true ? "cc" : "c");
-    write_file(main_file_path.str(), args["cxx"] == true ? CXX_DEFAULT_CODE : C_DEFAULT_CODE);
+    main_file_path << path << "/src/main."
+                   << (args["cxx"] == true ? "cc" : "c");
+    write_file(main_file_path.str(),
+               args["cxx"] == true ? CXX_DEFAULT_CODE : C_DEFAULT_CODE);
 
     // Write config to .cpm config file
     std::ostringstream cpm_config_file_path;
     cpm_config_file_path << path << "/.cpm/config.json";
-    json config = {
-        {"libs", json::array()},
-        {"compile-flags", {"-Wall", "-Werror", std::string("-o bin/") + args.get("project_name")}}
-    };
+    json config = {{"libs", json::array()},
+                   {"compile-flags",
+                    {"-Wall", "-Werror",
+                     std::string("-o bin/") + args.get("project_name")}}};
     write_file(cpm_config_file_path.str(), config.dump(4), true);
     return EXIT_SUCCESS;
 }
